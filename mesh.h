@@ -29,6 +29,7 @@ private:
     GLuint drawList;
     QRect rect;
     vector<int> selectVertexIds;
+    MyMesh copy;
 
     //QPoint win_coord(MyMesh::Point point);
 
@@ -38,9 +39,12 @@ public:
     void select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight);
     void setRegion(QRect rect);
     void changeSelectedPosition(float dx, float dy, float dz);
+    void rotateSelected(float rx, float ry, float rz);
     void deformation();
     vector<int>& getSelectVertexIds(){return selectVertexIds;}
     MyMesh& getMesh(){return mesh;}
+    void loadObj(string filename);
+    void Reset();
 
 
 

@@ -73,6 +73,9 @@ public slots:
     void setYPosition(float delta);
     void setZPosition(float delta);
 
+    void rotateSelected(float x, float y, float z);
+    void loadObj(string filename);
+
 signals:
     void xRotationChanged(int angle);
     void yRotationChanged(int angle);

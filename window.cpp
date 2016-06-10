@@ -39,14 +39,31 @@
 ****************************************************************************/
 
 #include <QtWidgets>
-
+#include <QMenuBar>
 #include "glwidget.h"
 #include "window.h"
 
 //! [0]
 Window::Window()
 {
+    QAction *load = new QAction("Load", this);
+    QAction *reset = new QAction("Reset", this);
+    QMenuBar *menuBar = new QMenuBar;
+    QMenu *menu;
+    menu = menuBar->addMenu("Menu");
+    menu->addAction(load);
+    menu->addAction(reset);
     glWidget = new GLWidget;
+
+    connect(load, &QAction::triggered, [=]{
+        QString fileName = QFileDialog::getOpenFileName(this,
+            tr("Load Obj"), ".", tr("Obj Files (*.obj)"));
+        glWidget->loadObj(fileName.toStdString());
+    });
+    connect(reset, &QAction::triggered, [=]{
+        glWidget->obj.Reset();
+        glWidget->update();
+    });
 
     xSlider = createSlider();
     ySlider = createSlider();
@@ -63,7 +80,7 @@ Window::Window()
 
 //! [1]
     QVBoxLayout *globalLayout = new QVBoxLayout;
-
+    globalLayout->addWidget(menuBar);
     QHBoxLayout *mainLayout = new QHBoxLayout;
     mainLayout->addWidget(glWidget);
     mainLayout->addWidget(xSlider);
@@ -79,14 +96,28 @@ Window::Window()
             px = LineEdit();
             py = LineEdit();
             pz = LineEdit();
-            QLabel *pl = new QLabel("PositionChange");
+            QLabel *pl = new QLabel("Position");
             controller->addWidget(pl);
             controller->addWidget(px);
             controller->addWidget(py);
             controller->addWidget(pz);
         position->setLayout(controller);
+
+        QWidget *rotate = new QWidget;
+            QHBoxLayout *rotater = new QHBoxLayout;
+            rx = LineEdit();
+            ry = LineEdit();
+            rz = LineEdit();
+            QLabel *rl = new QLabel("Rotate");
+            rotater->addWidget(rl);
+            rotater->addWidget(rx);
+            rotater->addWidget(ry);
+            rotater->addWidget(rz);
+       rotate->setLayout(rotater);
+
         QPushButton *button = new QPushButton("Deformation");
     bottom->addWidget(position);
+    bottom->addWidget(rotate);
     bottom->addWidget(button);
     QWidget* bw = new QWidget;
     bw->setLayout(bottom);
@@ -118,6 +149,33 @@ Window::Window()
         if(ok)
         glWidget->setZPosition(value);
         pz->setText("0");
+    });
+
+    connect(rx, &QLineEdit::editingFinished, [=](){
+        QString content = rx->text();
+        bool ok;
+         float value = content.toFloat(&ok);
+        if(ok)
+        glWidget->rotateSelected(value, 0, 0);
+        rx->setText("0");
+    });
+
+    connect(ry, &QLineEdit::editingFinished, [=](){
+        QString content = ry->text();
+        bool ok;
+        float value = content.toFloat(&ok);
+        if(ok)
+        glWidget->rotateSelected(0, value, 0);
+        ry->setText("0");
+    });
+
+    connect(rz, &QLineEdit::editingFinished, [=](){
+        QString content = rz->text();
+        bool ok;
+        float value = content.toFloat(&ok);
+        if(ok)
+        glWidget->rotateSelected(0, 0, value);
+        rz->setText("0");
     });
 
     connect(button, &QPushButton::clicked, [=](){
@@ -152,6 +210,17 @@ QLineEdit *Window::LineEdit()
     QLineEdit *line = new QLineEdit;
     line->setText("0");
     return line;
+}
+
+QSlider *Window::createRotater()
+{
+    QSlider *slider = new QSlider(Qt::Horizontal);
+    slider->setRange(0, 360 * 16);
+    slider->setSingleStep(16);
+    slider->setPageStep(15 * 16);
+    slider->setTickInterval(15 * 16);
+    slider->setTickPosition(QSlider::TicksRight);
+    return slider;
 }
 
 //! [2]

@@ -40,7 +40,6 @@
 
 #include <QtWidgets>
 #include <QtOpenGL>
-
 #include <math.h>
 
 #include "glwidget.h"
@@ -147,6 +146,16 @@ void GLWidget::setZPosition(float delta)
     obj.changeSelectedPosition(0, 0, delta);
     update();
 }
+void GLWidget::rotateSelected(float x, float y, float z)
+{
+    obj.rotateSelected(x, y, z);
+    update();
+}
+
+void GLWidget::loadObj(string filename)
+{
+    obj.loadObj(filename);
+}
 
 //! [6]
 void GLWidget::initializeGL()
@@ -173,16 +182,16 @@ void GLWidget::setLight()
 {
     GLfloat ambient[] = {0.0, 0.0, 0.0, 1.0};
     GLfloat diffuse[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
+    //GLfloat specular[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat position[] = {0.0, 3.0, 2.0, 0.0};
-    GLfloat lmodel_ambient[] = {0.4, 0.4, 0.4, 1.0};
+    //GLfloat lmodel_ambient[] = {0.4, 0.4, 0.4, 1.0};
 
     glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
 
     GLfloat mat_ambient[] = {1.0, 1.0, 1.0, 1.0};
-    GLfloat mat_ambient_color[] = {0.8,0.8,0.2, 1.0};
+    //GLfloat mat_ambient_color[] = {0.8,0.8,0.2, 1.0};
     GLfloat mat_diffuse[] = {0.1, 0.5, 0.9, 1.0};
     GLfloat mat_specular[] = {1.0, 1.0, 1.0, 1.0};
     GLfloat high_shininess[] = {100.0};
@@ -224,7 +233,7 @@ void GLWidget::paintGL()
         float project_data[16];
         glGetFloatv(GL_MODELVIEW_MATRIX, modelview_data);
         glGetFloatv(GL_PROJECTION_MATRIX, project_data);
-        qDebug() << "select!";
+        //qDebug() << "select!";
         obj.select(QMatrix4x4(modelview_data), QMatrix4x4(project_data), viewport, viewHeight);
         pd.setObj(this->obj);
         select = false;
@@ -260,7 +269,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 {
     //regison selection
     origin = event->pos();
-    qDebug() << "mouse Press";
+    //qDebug() << "mouse Press";
     //qDebug() << origin;
     /*if(!rubberband)
         rubberband = new QRubberBand(QRubberBand::Rectangle, this);

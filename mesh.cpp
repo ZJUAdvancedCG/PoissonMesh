@@ -1,5 +1,6 @@
 #include "mesh.h"
 #include <fstream>
+#include <QQuaternion>
 using namespace std;
 
 MeshObj::MeshObj(string filename)
@@ -14,16 +15,6 @@ MeshObj::MeshObj(string filename)
     catch(std::ios_base::failure& e) {
         qDebug() << e.what();
     }*/
-
-     if (!OpenMesh::IO::read_mesh(mesh, filename))
-     {
-         qDebug() << "Error: Cannot read mesh from " << filename.data();
-         //qDebug() << filename
-     }
-     else{
-         qDebug() << "Succ";
-     }
-
 
 }
 
@@ -137,19 +128,56 @@ void MeshObj::select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewpor
 
 void MeshObj::changeSelectedPosition(float dx, float dy, float dz)
 {
-    qDebug() << dx << dy << dz;
+    //qDebug() << dx << dy << dz;
     for(int id:selectVertexIds)
     {
         MyMesh::VertexHandle vhl(id);
         MyMesh::Point point = mesh.point(vhl);
         MyMesh::Point d(dx, dy, dz);
-        qDebug() << point[0] << " " << point[1] << " " << point[2];
+        //qDebug() << point[0] << " " << point[1] << " " << point[2];
 
         mesh.set_point(vhl, point+d);
         //
-        point = mesh.point(vhl);
-        qDebug() << point[0] << " " << point[1] << " " << point[2];
+        //point = mesh.point(vhl);
+        //qDebug() << point[0] << " " << point[1] << " " << point[2];
     }
+}
+
+void MeshObj::rotateSelected(float rx, float ry, float rz)
+{
+    QQuaternion rotate = QQuaternion::fromEulerAngles(rx, ry, rz);
+    QMatrix4x4 matrix(rotate.toRotationMatrix());
+
+    for(int id:selectVertexIds)
+    {
+        MyMesh::VertexHandle vhl(id);
+        QVector4D position(mesh.point(vhl)[0], mesh.point(vhl)[1], mesh.point(vhl)[2], 1.0);
+        position = position*matrix;
+        MyMesh::Point newposition(position.x(), position.y(), position.z());
+        mesh.set_point(vhl, newposition);
+        //
+        //point = mesh.point(vhl);
+        //qDebug() << point[0] << " " << point[1] << " " << point[2];
+    }
+}
+
+void MeshObj::loadObj(string filename)
+{
+    if (!OpenMesh::IO::read_mesh(mesh, filename))
+    {
+        qDebug() << "Error: Cannot read mesh from " << filename.data();
+        //qDebug() << filename
+    }
+    else{
+        copy = mesh;
+        //qDebug() << "Succ";
+    }
+
+}
+
+void MeshObj::Reset()
+{
+    mesh = copy;
 }
 
 #include <QMessageBox>

@@ -46,6 +46,7 @@
 QT_BEGIN_NAMESPACE
 class QSlider;
 class QLineEdit;
+class QMenu;
 QT_END_NAMESPACE
 //! [0]
 class GLWidget;
@@ -63,12 +64,15 @@ protected:
 private:
     QSlider *createSlider();
     QLineEdit *LineEdit();
+    QSlider *createRotater();
+
     GLWidget *glWidget;
     QSlider *xSlider;
     QSlider *ySlider;
     QSlider *zSlider;
 
     QLineEdit *px,*py,*pz;
+    QLineEdit *rx, *ry, *rz;
 };
 //! [0]
 
