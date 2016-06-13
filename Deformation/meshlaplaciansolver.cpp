@@ -2,7 +2,7 @@
 #include "../utility/pointvector.h"
 #include <algorithm>
 #include <QDebug>
-
+IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
 void MeshLaplacianSolver::ComputeVertexLaplacianWeight()
 {
     mesh.add_property(vertexLPLWeight);
@@ -39,11 +39,12 @@ void MeshLaplacianSolver::ComputeVertexLaplacianWeight()
 
 }
 
-
+#include <iostream>
 void MeshLaplacianSolver::ComputeLaplacianMatrix()
 {
     ComputeVertexLaplacianWeight();
-    assert(!selectVertexId.empty());
+    //assert(!selectVertexId.empty());
+    assert(!isControlVertex.empty());
 
     int numVertices = mesh.n_vertices();
     A.resize(numVertices,numVertices);
@@ -52,7 +53,8 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
     {
         int vindex = v_it.handle().idx();
 
-        if (find(selectVertexId.begin(),selectVertexId.end(),vindex)!=selectVertexId.end())
+       // if (find(selectVertexId.begin(),selectVertexId.end(),vindex)!=selectVertexId.end())
+        if(isControlVertex[vindex])
         {
             // control points
             A.coeffRef(vindex,vindex) = 1.0;
@@ -70,12 +72,16 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
                 sum +=  weights[id++];
             }
             A.coeffRef(vindex,vindex) = sum;
-            qDebug()<<sum<<" ";
+            //qDebug()<<sum<<" ";
         }
     }
 
     //pre QR decompose
+    std::cout << "---A---" << std::endl;
+    std::cout << A << std::endl;
+    //std::cout <<"--compressed A--" <<std::endl;
     A.makeCompressed();
+    //std::cout << A << std::endl;
     solver.analyzePattern(A);
     solver.factorize(A);
 }

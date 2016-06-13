@@ -19,6 +19,7 @@ private:
 
     MyMesh mesh;
     vector<int> selectVertexId;
+    vector<int> fixVertexId;
     MyMesh m_static_mesh;
     std::vector<double> freeVertexWeight;
 
@@ -33,6 +34,9 @@ public:
                                 Point3D& source,Point3D& left,Point3D& right);
 
     void deform();
+    vector<bool> isControlVertex();
+
+    void InterTransform(const Matrix4d &mat);
 };
 
 

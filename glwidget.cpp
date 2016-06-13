@@ -41,6 +41,7 @@
 #include <QtWidgets>
 #include <QtOpenGL>
 #include <math.h>
+#include <Eigen/Eigen>
 
 #include "glwidget.h"
 //#include "qtlogo.h"
@@ -51,12 +52,12 @@
 
 //! [0]
 GLWidget::GLWidget(QWidget *parent)
-    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
-    ,obj("cuboid.obj")
+    : QGLWidget(QGLFormat(QGL::SampleBuffers), parent),
+      obj()
    // ,rubberband(QRubberBand::Rectangle, this)
 {
     //logo = 0;
-
+    selectMode = true;
     xRot = 0;
     yRot = 0;
     zRot = 0;
@@ -129,26 +130,29 @@ void GLWidget::setZRotation(int angle)
     }
 }
 
-void GLWidget::setXPosition(float delta)
+void GLWidget::setSelectedPosition(float dx, float dy, float dz)
 {
-    obj.changeSelectedPosition(delta, 0, 0);
+    obj.changeSelectedPosition(dx, dy, dz);
+    Affine3d transform(Translation3d(dx, dy, dz));
+    Matrix4d mat = transform.matrix();
+    pd.InterTransform(mat);
     update();
 }
 
-void GLWidget::setYPosition(float delta)
-{
-    obj.changeSelectedPosition(0, delta, 0);
-    update();
-}
-
-void GLWidget::setZPosition(float delta)
-{
-    obj.changeSelectedPosition(0, 0, delta);
-    update();
-}
 void GLWidget::rotateSelected(float x, float y, float z)
 {
     obj.rotateSelected(x, y, z);
+    QQuaternion rotate = QQuaternion::fromEulerAngles(x, y, z);
+    qDebug() << "rotate Matrix";
+    qDebug() << rotate.toRotationMatrix();
+    QVector4D qrotate = rotate.toVector4D();
+    Matrix3d mat3 = Quaterniond(qrotate.w(),qrotate.x(), qrotate.y(), qrotate.z()).toRotationMatrix();
+    Matrix4d mat4 = Matrix4d::Identity();
+    mat4.block(0,0,3,3) = mat3;
+
+    pd.InterTransform(mat4);
+
+    qDebug() << "update!!";
     update();
 }
 
@@ -162,10 +166,7 @@ void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
 
-    //qglClearColor(qtPurple.dark());
-    qglClearColor(QColor(1, 1, 1));
-    //logo = new QtLogo(this,xdD∂64);
-    //logo->setColor(qtGreen.dark());
+    qglClearColor(QColor(0, 0, 0));
 
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
@@ -234,7 +235,10 @@ void GLWidget::paintGL()
         glGetFloatv(GL_MODELVIEW_MATRIX, modelview_data);
         glGetFloatv(GL_PROJECTION_MATRIX, project_data);
         //qDebug() << "select!";
-        obj.select(QMatrix4x4(modelview_data), QMatrix4x4(project_data), viewport, viewHeight);
+        if(selectMode)
+            obj.select(QMatrix4x4(modelview_data), QMatrix4x4(project_data), viewport, viewHeight);
+        else
+            obj.fix(QMatrix4x4(modelview_data), QMatrix4x4(project_data), viewport, viewHeight);
         pd.setObj(this->obj);
         select = false;
     }
@@ -258,7 +262,7 @@ void GLWidget::resizeGL(int width, int height)
     glOrthof(-0.5, +0.5, -0.5, +0.5, 4.0, 15.0);
 #else
     glOrtho(-0.5, +0.5, -0.5, +0.5, 0.1, 50.0);
-    //glFrustum(-1.5, 1.5, -0.5, 0.5, 4, 15.0);
+    //glFrustum(-0.5, 0.5, -0.5, 0.5, 1.5, 40.0);
 #endif
     glMatrixMode(GL_MODELVIEW);
 }
@@ -317,6 +321,7 @@ void GLWidget::mouseReleaseEvent(QMouseEvent *event)
     select = true;
     obj.setRegion(selectRegion);
 
+
     update();
 }
 
@@ -325,5 +330,22 @@ void GLWidget::wheelEvent(QWheelEvent *event)
     if(scale+event->delta()/40<=0)
         return;
     scale+=(event->delta()/40);
+    update();
+}
+
+void GLWidget::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key()==Qt::Key_Equal)
+        scale += 1;
+    else if(event->key()==Qt::Key_Minus)
+        scale -= 1;
+
+    //handle select mode change
+    if(event->key()==Qt::Key_Shift)
+    {
+        selectMode = !selectMode;
+        qDebug() << "selectMode" << selectMode;
+        emit changeSelectMode(selectMode);
+    }
     update();
 }

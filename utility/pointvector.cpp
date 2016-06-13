@@ -207,7 +207,7 @@ Vector3D& Vector3D::operator ^= (const Vector3D& v)
 
 bool Vector3D::operator == (const Vector3D& v)
 {
-    return (abs(m_x - v.m_x) < 1e-8) && (abs(m_y - v.m_y) < 1e-8) && (abs(m_z - v.m_z) < 1e-8);
+    return (fabs(m_x - v.m_x) < 1e-8) && (fabs(m_y - v.m_y) < 1e-8) && (fabs(m_z - v.m_z) < 1e-8);
 }
 
 Vector3D Vector3D::operator - ( ) const

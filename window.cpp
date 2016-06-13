@@ -57,7 +57,7 @@ Window::Window()
 
     connect(load, &QAction::triggered, [=]{
         QString fileName = QFileDialog::getOpenFileName(this,
-            tr("Load Obj"), ".", tr("Obj Files (*.obj)"));
+            tr("Load Obj"), "../../../../PoissonMesh/obj", tr("Obj Files (*.obj)"));
         glWidget->loadObj(fileName.toStdString());
     });
     connect(reset, &QAction::triggered, [=]{
@@ -88,6 +88,9 @@ Window::Window()
     mainLayout->addWidget(zSlider);
     QWidget *w = new QWidget;
     w->setLayout(mainLayout);
+
+    selectModeLabel = new QLabel("Change");
+    globalLayout->addWidget(selectModeLabel);
     globalLayout->addWidget(w);
 
     QVBoxLayout *bottom = new QVBoxLayout;
@@ -129,8 +132,9 @@ Window::Window()
         bool ok;
          float value = content.toFloat(&ok);
         if(ok)
-        glWidget->setXPosition(value);
-        px->setText("0");
+        glWidget->setSelectedPosition(value, 0, 0);
+        px->clear();
+        //glWidget->setFocus();
     });
 
     connect(py, &QLineEdit::editingFinished, [=](){
@@ -138,8 +142,9 @@ Window::Window()
         bool ok;
         float value = content.toFloat(&ok);
         if(ok)
-        glWidget->setYPosition(value);
-        py->setText("0");
+        glWidget->setSelectedPosition(0, value, 0);
+        py->clear();
+       // glWidget->setFocus();
     });
 
     connect(pz, &QLineEdit::editingFinished, [=](){
@@ -147,8 +152,9 @@ Window::Window()
         bool ok;
         float value = content.toFloat(&ok);
         if(ok)
-        glWidget->setZPosition(value);
-        pz->setText("0");
+        glWidget->setSelectedPosition(0, 0, value);
+        pz->clear();
+       // glWidget->setFocus();
     });
 
     connect(rx, &QLineEdit::editingFinished, [=](){
@@ -157,7 +163,8 @@ Window::Window()
          float value = content.toFloat(&ok);
         if(ok)
         glWidget->rotateSelected(value, 0, 0);
-        rx->setText("0");
+        rx->clear();
+       //glWidget->setFocus();
     });
 
     connect(ry, &QLineEdit::editingFinished, [=](){
@@ -166,7 +173,8 @@ Window::Window()
         float value = content.toFloat(&ok);
         if(ok)
         glWidget->rotateSelected(0, value, 0);
-        ry->setText("0");
+        ry->clear();
+       // glWidget->setFocus();
     });
 
     connect(rz, &QLineEdit::editingFinished, [=](){
@@ -175,7 +183,8 @@ Window::Window()
         float value = content.toFloat(&ok);
         if(ok)
         glWidget->rotateSelected(0, 0, value);
-        rz->setText("0");
+        rz->clear();
+       // glWidget->setFocus();
     });
 
     connect(button, &QPushButton::clicked, [=](){
@@ -186,10 +195,17 @@ Window::Window()
         glWidget->updateGL();
     });
 
+    connect(glWidget, &GLWidget::changeSelectMode, [=](){
+        if(glWidget->getSelectMode())
+            selectModeLabel->setText("Change");
+        else
+            selectModeLabel->setText("Fix");
+    });
+
     xSlider->setValue(15 * 16);
     ySlider->setValue(345 * 16);
     zSlider->setValue(0 * 16);
-    setWindowTitle(tr("Hello GL"));
+    setWindowTitle(tr("PossionDeformation"));
 }
 //! [1]
 
@@ -202,13 +218,13 @@ QSlider *Window::createSlider()
     slider->setPageStep(15 * 16);
     slider->setTickInterval(15 * 16);
     slider->setTickPosition(QSlider::TicksRight);
+    slider->setValue(0);
     return slider;
 }
 
 QLineEdit *Window::LineEdit()
 {
     QLineEdit *line = new QLineEdit;
-    line->setText("0");
     return line;
 }
 

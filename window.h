@@ -47,6 +47,7 @@ QT_BEGIN_NAMESPACE
 class QSlider;
 class QLineEdit;
 class QMenu;
+class QLabel;
 QT_END_NAMESPACE
 //! [0]
 class GLWidget;
@@ -73,6 +74,8 @@ private:
 
     QLineEdit *px,*py,*pz;
     QLineEdit *rx, *ry, *rz;
+
+    QLabel *selectModeLabel;
 };
 //! [0]
 

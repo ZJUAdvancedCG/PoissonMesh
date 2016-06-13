@@ -61,6 +61,7 @@ public:
 
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
+    bool getSelectMode() {return selectMode;}
 //! [0]
 
 //! [1]
@@ -68,10 +69,7 @@ public slots:
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
-
-    void setXPosition(float delta);
-    void setYPosition(float delta);
-    void setZPosition(float delta);
+    void setSelectedPosition(float dx, float dy, float dz);
 
     void rotateSelected(float x, float y, float z);
     void loadObj(string filename);
@@ -80,6 +78,7 @@ signals:
     void xRotationChanged(int angle);
     void yRotationChanged(int angle);
     void zRotationChanged(int angle);
+    void changeSelectMode(bool mode);
 //! [1]
 
 //! [2]
@@ -91,6 +90,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void mouseReleaseEvent(QMouseEvent *event) Q_DECL_OVERRIDE;
     void wheelEvent(QWheelEvent *) Q_DECL_OVERRIDE;
+    void keyPressEvent(QKeyEvent *) Q_DECL_OVERRIDE;
 //! [2]
 
 //! [3]
@@ -111,6 +111,7 @@ private:
     QRect selectRegion;
     void setLight();
     bool select;
+    bool selectMode; //true for selecting points to change, false for selecting points to fix
 };
 //! [3]
 

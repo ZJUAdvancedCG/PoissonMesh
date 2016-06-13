@@ -25,23 +25,25 @@ typedef OpenMesh::TriMesh_ArrayKernelT<MeshTraits> MyMesh;
 class MeshObj
 {
 private:
-    MyMesh mesh;
     GLuint drawList;
     QRect rect;
     vector<int> selectVertexIds;
+    vector<int> fixVertexIds;
     MyMesh copy;
-
-    //QPoint win_coord(MyMesh::Point point);
+    bool changeMesh;
 
 public:
-    MeshObj(string filename);
+    MyMesh mesh;
+    MeshObj();
     void draw(QOpenGLFunctions_1_1 *functions);
     void select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight);
+    void fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight);
     void setRegion(QRect rect);
     void changeSelectedPosition(float dx, float dy, float dz);
     void rotateSelected(float rx, float ry, float rz);
     void deformation();
-    vector<int>& getSelectVertexIds(){return selectVertexIds;}
+    vector<int> &getSelectVertexIds(){return selectVertexIds;}
+    vector<int> &getFixVertexIds(){return fixVertexIds;}
     MyMesh& getMesh(){return mesh;}
     void loadObj(string filename);
     void Reset();

@@ -3,7 +3,7 @@
 #include <QQuaternion>
 using namespace std;
 
-MeshObj::MeshObj(string filename)
+MeshObj::MeshObj()
 {
     /*try{
     ifstream in(filename);
@@ -34,17 +34,31 @@ void MeshObj::draw(QOpenGLFunctions_1_1 *functions)
 
     //draw selected points
     functions->glColor3f(0,1,0);
-    glPointSize(100);
+    functions->glPointSize(100);
     for(int id:selectVertexIds)
     {
         MyMesh::VertexHandle vhl(id);
         MyMesh::Point point = mesh.point(vhl);
-        //qDebug() << point[0] << point[1] << point[2];
         functions->glVertex3f(point[0], point[1], point[2]);
     }
+    functions->glEnd();
 
+    functions->glBegin(GL_POINTS);
+
+    //draw fix points
+    functions->glColor3f(0,0,1);
+    functions->glPointSize(100);
+    for(int id:fixVertexIds)
+    {
+        MyMesh::VertexHandle vhl(id);
+        MyMesh::Point point = mesh.point(vhl);
+        functions->glVertex3f(point[0], point[1], point[2]);
+    }
+    functions->glEnd();
+
+    functions->glBegin(GL_POINTS);
     functions->glColor3f(1, 0, 0);
-    glPointSize(5);
+    functions->glPointSize(5);
 
     for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
 	{
@@ -54,7 +68,7 @@ void MeshObj::draw(QOpenGLFunctions_1_1 *functions)
     }
 
 	functions->glEnd();
-	functions->glPointSize(1);
+    functions->glPointSize(1);
     //functions->glEndList();
 
     //functions->glCallList(drawList);
@@ -95,6 +109,54 @@ void MeshObj::setRegion(QRect rect)
     this->rect = rect;
 }
 
+void MeshObj::fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight)
+{
+    fixVertexIds.clear();
+    //qDebug() << viewport;
+
+    for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
+    {
+        MyMesh::Point point = mesh.point(vit);
+        int id = vit.handle().idx();
+        QVector4D vertex(point[0], point[1], point[2], 1.0);
+        //qDebug() << vertex;
+        vertex = vertex*modelview;
+        vertex = vertex*project;
+
+        if(fabs(vertex[3]-0.0)>=0.0000001f)
+        {
+            float div = 1.0f/vertex[3];
+            vertex[0] *= div;
+            vertex[1] *= div;
+        }
+
+        float x = float(viewport[0])+(1.0+vertex[0])*viewport[2]/2.0f;
+        float y = float(viewport[1])+(1.0+vertex[1])*viewport[3]/2.0f;
+        //qDebug() << "x:" << x << "y:" << y;
+        y = viewheight-y;
+        QPoint pos(x,y);
+        //qDebug() << pos;
+
+        if(rect.contains(pos))
+        {
+            fixVertexIds.push_back(id);
+            qDebug() << "Fix: Contains" << id;
+        }
+    }
+
+    //force debug
+    //fixVertexIds.clear();
+    //fixVertexIds.push_back(4);
+    //fixVertexIds.push_back(5);
+    //fixVertexIds.push_back(6);
+    //fixVertexIds.push_back(7);
+
+
+    //qDebug() << rect;
+    //qDebug() << "size " << selectVertexIds.size();
+}
+
+
 void MeshObj::select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight)
 {
     selectVertexIds.clear();
@@ -109,6 +171,13 @@ void MeshObj::select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewpor
         vertex = vertex*modelview;
         vertex = vertex*project;
 
+        if(fabs(vertex[3]-0.0)>=0.0000001f)
+        {
+            float div = 1.0f/vertex[3];
+            vertex[0] *= div;
+            vertex[1] *= div;
+        }
+
         float x = float(viewport[0])+(1.0+vertex[0])*viewport[2]/2.0f;
         float y = float(viewport[1])+(1.0+vertex[1])*viewport[3]/2.0f;
         //qDebug() << "x:" << x << "y:" << y;
@@ -122,6 +191,15 @@ void MeshObj::select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewpor
             //qDebug() << "Contains" << id;
         }
     }
+
+    //force debug
+   /*selectVertexIds.clear();
+    selectVertexIds.push_back(0);
+    selectVertexIds.push_back(1);
+    selectVertexIds.push_back(2);
+    selectVertexIds.push_back(3);*/
+
+
     //qDebug() << rect;
     //qDebug() << "size " << selectVertexIds.size();
 }
@@ -152,7 +230,7 @@ void MeshObj::rotateSelected(float rx, float ry, float rz)
     {
         MyMesh::VertexHandle vhl(id);
         QVector4D position(mesh.point(vhl)[0], mesh.point(vhl)[1], mesh.point(vhl)[2], 1.0);
-        position = position*matrix;
+        position = matrix*position;
         MyMesh::Point newposition(position.x(), position.y(), position.z());
         mesh.set_point(vhl, newposition);
         //
