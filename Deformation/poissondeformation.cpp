@@ -14,8 +14,8 @@ void PoissonDeformation::setObj(MeshObj& meshObj)
     m_handTransMat = Matrix4d::Identity();
     m_quater_fixed.R2Q(0,1,0,0);
     vector<bool> iscontrol = isControlVertex();
-    QVector<bool> qbool = QVector<bool>::fromStdVector(iscontrol);
-    qDebug() << qbool;
+   // QVector<bool> qbool = QVector<bool>::fromStdVector(iscontrol);
+   // qDebug() << qbool;
     LPsolver.set(mesh,isControlVertex());
 }
 
@@ -36,7 +36,7 @@ void PoissonDeformation::ComputeFreeVertexWeight(){
     int nvertex = mesh.n_vertices();
     VectorXd b(nvertex); b.setZero();
 
-    for(int i = 0; i < selectVertexId.size(); i++)
+    for(unsigned i = 0; i < selectVertexId.size(); i++)
     {
         int handIndex = selectVertexId[i];
         b[handIndex]  =  1;
@@ -88,13 +88,13 @@ void PoissonDeformation::ComputeDivergence()
 
     for(MyMesh::VertexIter v_it = m_static_mesh.vertices_begin(); v_it != m_static_mesh.vertices_end(); v_it++)
     {
-        vid = v_it.handle().idx();
+        vid = v_it->idx();
         //if (find(selectVertexId.begin(),selectVertexId.end(),vid)!=selectVertexId.end())
         if(isControl[vid])
         {
-            divMatrixX[vid] = mesh.point(v_it)[0];
-            divMatrixY[vid] = mesh.point(v_it)[1];
-            divMatrixZ[vid] = mesh.point(v_it)[2];
+            divMatrixX[vid] = mesh.point(*v_it)[0];
+            divMatrixY[vid] = mesh.point(*v_it)[1];
+            divMatrixZ[vid] = mesh.point(*v_it)[2];
             /*printf("%d------\n", vid);
             puts("--b x--");
             std::cout << divMatrixX.format(CommaInitFmt) << std::endl;
@@ -106,12 +106,12 @@ void PoissonDeformation::ComputeDivergence()
             continue;
         }
 
-        for(MyMesh::VertexFaceIter vf_it = m_static_mesh.vf_begin(v_it); vf_it != m_static_mesh.vf_end(v_it); vf_it++)
+        for(MyMesh::VertexFaceIter vf_it = m_static_mesh.vf_begin(*v_it); vf_it != m_static_mesh.vf_end(*v_it); vf_it++)
         {
-            MyMesh::FaceVertexIter fv_it = m_static_mesh.fv_begin(vf_it);
-            int tri_vid0 = fv_it.handle().idx(); fv_it++;
-            int tri_vid1 = fv_it.handle().idx(); fv_it++;
-            int tri_vid2 = fv_it.handle().idx();
+            MyMesh::FaceVertexIter fv_it = m_static_mesh.fv_begin(*vf_it);
+            int tri_vid0 = fv_it->idx(); fv_it++;
+            int tri_vid1 = fv_it->idx(); fv_it++;
+            int tri_vid2 = fv_it->idx();
 
             if(tri_vid0 == vid)		{ l = tri_vid1; r = tri_vid2;}
             else if(tri_vid1 == vid){ l = tri_vid0; r = tri_vid2;}
@@ -263,7 +263,7 @@ void PoissonDeformation::deform()
     //update mesh
     MyMesh::VertexHandle vh;
     MyMesh& mesh = this->pMeshObj->getMesh();
-    for(int i = 0; i < mesh.n_vertices(); i++)
+    for(unsigned i = 0; i < mesh.n_vertices(); i++)
     {
         vh  = mesh.vertex_handle(i);
 

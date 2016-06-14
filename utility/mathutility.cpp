@@ -171,8 +171,8 @@ Matrix4d MathUtility::Scale2Matrix(double x,double y,double z)
      double  minZ  = INFINITY;
      for(MyMesh::VertexIter vi = desMesh.vertices_begin(); vi != desMesh.vertices_end(); vi++)
      {
-         if(desMesh.point(vi)[2] < minZ)
-             minZ = desMesh.point(vi)[2];
+         if(desMesh.point(*vi)[2] < minZ)
+             minZ = desMesh.point(*vi)[2];
      }
      minZ -= 1;
 
@@ -186,7 +186,7 @@ Matrix4d MathUtility::Scale2Matrix(double x,double y,double z)
 
      for(MyMesh::FaceIter f_it = desMesh.faces_begin(); f_it != desMesh.faces_end(); f_it++)
      {
-        MyMesh::Normal fn = desMesh.normal(f_it);
+        MyMesh::Normal fn = desMesh.normal(*f_it);
         Vector3D f_normal = Vector3D(fn[0],fn[1],fn[2]);
         double dianji = f_normal * upVector;
         int signx = dianji >= 0 ? 1 : -1;
@@ -194,9 +194,9 @@ Matrix4d MathUtility::Scale2Matrix(double x,double y,double z)
 
         int i = 0;
         Point3D triVertex[3];
-        for(MyMesh::FaceVertexIter fv_it = desMesh.fv_begin(f_it); fv_it != desMesh.fv_end(f_it); fv_it++)
+        for(MyMesh::FaceVertexIter fv_it = desMesh.fv_begin(*f_it); fv_it != desMesh.fv_end(*f_it); fv_it++)
         {
-            MyMesh::Point point = desMesh.point(fv_it);
+            MyMesh::Point point = desMesh.point(*fv_it);
             triVertex[i++] = Point3D(point[0],point[1],point[2]);
             prismHeight += (point[2] - minZ);
         }
@@ -228,15 +228,15 @@ Matrix4d MathUtility::Scale2Matrix(double x,double y,double z)
          vector<Vector3D> triFaceNorm;
 
 
-         for(MyMesh::VertexFaceIter vf_i = desMesh.vf_begin(vi); vf_i != desMesh.vf_end(vi); vf_i++)
+         for(MyMesh::VertexFaceIter vf_i = desMesh.vf_begin(*vi); vf_i != desMesh.vf_end(*vi); vf_i++)
          {
              int i = 0;
              Point3D triPoint[3];
-             triFaceNorm.push_back(Vector3D(desMesh.normal(vf_i)[0],desMesh.normal(vf_i)[1],desMesh.normal(vf_i)[2]));
+             triFaceNorm.push_back(Vector3D(desMesh.normal(*vf_i)[0],desMesh.normal(*vf_i)[1],desMesh.normal(*vf_i)[2]));
 
-             for(MyMesh::FaceVertexIter fv_i = desMesh.fv_begin(vf_i); fv_i != desMesh.fv_end(vf_i); fv_i++)
+             for(MyMesh::FaceVertexIter fv_i = desMesh.fv_begin(*vf_i); fv_i != desMesh.fv_end(*vf_i); fv_i++)
              {
-                 MyMesh::Point point =  desMesh.point(fv_i);
+                 MyMesh::Point point =  desMesh.point(*fv_i);
                  triPoint[i++] = Point3D(point[0],point[1],point[2]);
              }
 
@@ -246,14 +246,14 @@ Matrix4d MathUtility::Scale2Matrix(double x,double y,double z)
          }
 
          Vector3D avgNorm;
-         for(int i = 0; i < triAreas.size(); i++)
+         for(unsigned i = 0; i < triAreas.size(); i++)
          {
              double rato = triAreas[i]/sumArea;
              avgNorm += triFaceNorm[i] * rato;
          }
 
          avgNorm.mf_normalize();
-         vNormal[vi.handle().idx()] = avgNorm;
+         vNormal[vi->idx()] = avgNorm;
 
 
         // Vector3D vNorm(desMesh.normal(vi)[0],desMesh.normal(vi)[1],desMesh.normal(vi)[2]);

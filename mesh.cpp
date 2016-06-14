@@ -91,7 +91,7 @@ void MeshObj::draw(QOpenGLFunctions_1_1 *functions)
         functions->glBegin(GL_POLYGON);
 
         functions->glNormal3dv(mesh.normal(*fit).data());
-        for(MyMesh::FaceVertexIter fvit=mesh.fv_begin(fit);fvit!=mesh.fv_end(fit);fvit++)
+        for(MyMesh::FaceVertexIter fvit=mesh.fv_iter(*fit);fvit.is_valid();fvit++)
         {
             functions->glNormal3dv(mesh.normal(*fvit).data());
             functions->glVertex3dv(mesh.point(*fvit).data());
@@ -116,8 +116,8 @@ void MeshObj::fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4
 
     for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
     {
-        MyMesh::Point point = mesh.point(vit);
-        int id = vit.handle().idx();
+        MyMesh::Point point = mesh.point(*vit);
+        int id = vit->idx();
         QVector4D vertex(point[0], point[1], point[2], 1.0);
         //qDebug() << vertex;
         vertex = vertex*modelview;
@@ -140,7 +140,7 @@ void MeshObj::fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4
         if(rect.contains(pos))
         {
             fixVertexIds.push_back(id);
-            qDebug() << "Fix: Contains" << id;
+            //qDebug() << "Fix: Contains" << id;
         }
     }
 
@@ -164,8 +164,8 @@ void MeshObj::select(QMatrix4x4 modelview, QMatrix4x4 project, const int viewpor
 
     for (MyMesh::VertexIter vit = mesh.vertices_begin(); vit != mesh.vertices_end(); ++vit)
     {
-        MyMesh::Point point = mesh.point(vit);
-        int id = vit.handle().idx();
+        MyMesh::Point point = mesh.point(*vit);
+        int id = vit->idx();
         QVector4D vertex(point[0], point[1], point[2], 1.0);
         //qDebug() << vertex;
         vertex = vertex*modelview;

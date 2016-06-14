@@ -143,8 +143,8 @@ void GLWidget::rotateSelected(float x, float y, float z)
 {
     obj.rotateSelected(x, y, z);
     QQuaternion rotate = QQuaternion::fromEulerAngles(x, y, z);
-    qDebug() << "rotate Matrix";
-    qDebug() << rotate.toRotationMatrix();
+    //qDebug() << "rotate Matrix";
+    //qDebug() << rotate.toRotationMatrix();
     QVector4D qrotate = rotate.toVector4D();
     Matrix3d mat3 = Quaterniond(qrotate.w(),qrotate.x(), qrotate.y(), qrotate.z()).toRotationMatrix();
     Matrix4d mat4 = Matrix4d::Identity();
@@ -284,7 +284,7 @@ void GLWidget::mousePressEvent(QMouseEvent *event)
 //! [9]
 
 //! [10]
-void GLWidget::mouseMoveEvent(QMouseEvent *event)
+void GLWidget::mouseMoveEvent(QMouseEvent *)
 {
     //qDebug() << "Pressing...";
     //

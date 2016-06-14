@@ -25,12 +25,12 @@ typedef OpenMesh::TriMesh_ArrayKernelT<MeshTraits> MyMesh;
 class MeshObj
 {
 private:
-    GLuint drawList;
+    //GLuint drawList;
     QRect rect;
     vector<int> selectVertexIds;
     vector<int> fixVertexIds;
     MyMesh copy;
-    bool changeMesh;
+    //bool changeMesh;
 
 public:
     MyMesh mesh;

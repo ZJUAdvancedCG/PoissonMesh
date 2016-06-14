@@ -7,16 +7,16 @@ void MeshLaplacianSolver::ComputeVertexLaplacianWeight()
 {
     mesh.add_property(vertexLPLWeight);
     for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it){
-        MyMesh::Point point = mesh.point(v_it);
+        MyMesh::Point point = mesh.point(*v_it);
         Vector3D currentVertex = Vector3D(point[0],point[1],point[2]);
         vector<Vector3D> neighborVertices;
-        for(MyMesh::VertexVertexIter vv_it = mesh.vv_iter(v_it);vv_it;++vv_it)
+        for(MyMesh::VertexVertexIter vv_it = mesh.vv_iter(*v_it);vv_it.is_valid();++vv_it)
         {
-            MyMesh::Point point = mesh.point(vv_it);
+            MyMesh::Point point = mesh.point(*vv_it);
             neighborVertices.push_back(Vector3D(point[0],point[1],point[2]));
         }
 
-        bool isBorderVertex = mesh.is_boundary(v_it);
+        bool isBorderVertex = mesh.is_boundary(*v_it);
         int numNeighbors = (int)neighborVertices.size();
         vector<double> weights(numNeighbors,0);
         for (int i=0; i<numNeighbors; i++)
@@ -34,7 +34,7 @@ void MeshLaplacianSolver::ComputeVertexLaplacianWeight()
             weights[i] = 0.5*(w1+w2);
             weights[i] = max(weights[i], EPSILON);
         }
-        mesh.property(vertexLPLWeight, v_it) = weights;
+        mesh.property(vertexLPLWeight, *v_it) = weights;
     }
 
 }
@@ -51,7 +51,7 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
 
     for (MyMesh::VertexIter v_it = mesh.vertices_begin(); v_it!=mesh.vertices_end(); ++v_it)
     {
-        int vindex = v_it.handle().idx();
+        int vindex = v_it->idx();
 
        // if (find(selectVertexId.begin(),selectVertexId.end(),vindex)!=selectVertexId.end())
         if(isControlVertex[vindex])
@@ -62,12 +62,12 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
         else
         {
             double sum = 0.0;
-            vector<double> weights = mesh.property(vertexLPLWeight, v_it);
+            vector<double> weights = mesh.property(vertexLPLWeight, *v_it);
             int id = 0;
-            for (MyMesh::VertexVertexIter vv_it = mesh.vv_iter(v_it);  vv_it;  ++vv_it)
+            for (MyMesh::VertexVertexIter vv_it = mesh.vv_iter(*v_it);  vv_it.is_valid();  ++vv_it)
             {
 
-                int vvindex = vv_it.handle().idx();
+                int vvindex = vv_it->idx();
                 A.coeffRef(vindex, vvindex) = -weights[id];
                 sum +=  weights[id++];
             }
@@ -77,8 +77,8 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
     }
 
     //pre QR decompose
-    std::cout << "---A---" << std::endl;
-    std::cout << A << std::endl;
+    //std::cout << "---A---" << std::endl;
+    //std::cout << A << std::endl;
     //std::cout <<"--compressed A--" <<std::endl;
     A.makeCompressed();
     //std::cout << A << std::endl;
