@@ -1,5 +1,5 @@
 #include "poissondeformation.h"
-#include "../utility/mathutility.h"
+//#include "../utility/mathutility.h"
 #include <iostream>
 IOFormat CommaInitFmt(4, 0, ", ", "\n", "[", "]");
 
@@ -125,15 +125,16 @@ void PoissonDeformation::ComputeDivergence()
             //triangle local transform
             Point3D source_,right_,left_;
             TriangleLocalTransform(vh0,vh1,vh2,source_,left_,right_);
-            std::cout <<"source "<< source_.m_x << " " << source_.m_y << " " << source_.m_z << std::endl;
+            /*std::cout <<"source "<< source_.m_x << " " << source_.m_y << " " << source_.m_z << std::endl;
             std::cout <<"left "<< left_.m_x << " " << left_.m_y << " " << left_.m_z << std::endl;
-            std::cout <<"right "<< right_.m_x << " " << right_.m_y << " " << right_.m_z << std::endl;
+            std::cout <<"right "<< right_.m_x << " " << right_.m_y << " " << right_.m_z << std::endl;*/
             //compute divergence
             Vector3D W = ComputeTriangleDiv(source_,left_,right_,l,r);
-            std::cout << "W " << W.m_x << " " << W.m_y << " " << W.m_z << std::endl;
-            divMatrixX[vid] += W.m_x;
-            divMatrixY[vid] += W.m_y;
-            divMatrixZ[vid] += W.m_z;
+           // std::cout << "W " << W.m_x << " " << W.m_y << " " << W.m_z << std::endl;
+
+            divMatrixX[vid] += W.x();
+            divMatrixY[vid] += W.y();
+            divMatrixZ[vid] += W.z();
         }
        /* printf("%d------\n", vid);
         puts("--b x--");
@@ -171,6 +172,42 @@ void PoissonDeformation::ComputeDivergence()
 
 }
 
+double GetTriangleArea(const Point3D& v1,  const Point3D& v2, const Point3D& v3)
+{
+    Vector3D a = v2 - v1;
+    Vector3D b = v3 - v1;
+    Vector3D c = v2 - v3;
+
+    double aa = a.norm();
+    double bb = b.norm();
+    double cc = c.norm();
+    double p = (aa+bb+cc)/2.0;
+    double area = sqrt(p*(p-aa)*(p-bb)*(p-cc));
+
+    return area;
+}
+
+Vector3D GetTriangleVertexGradient( Vector3D a,  Vector3D b)
+{
+    Vector3D high, c;
+    double len2 = 0;
+    a = a*(-1);
+    b = b*(-1);
+    c = a - b;
+
+    double dotres = a.dot(c);
+
+    double lenc2 = c.x()*c.x() + c.y()*c.y() + c.z()*c.z();
+    double ratio = dotres / (lenc2);
+
+    high = (b - a)*ratio + a;
+    high = high*(-1);
+
+    double n = high.norm();
+    high /= (n*n);
+    return high;
+}
+
 Vector3D PoissonDeformation::ComputeTriangleDiv(const Point3D& source,const Point3D& vleft,const Point3D& vright,int l,int r)
 {
     Vector3D s_l = source - vleft;
@@ -181,26 +218,49 @@ Vector3D PoissonDeformation::ComputeTriangleDiv(const Point3D& source,const Poin
     Vector3D r_l = vright - vleft;
 
     //▽ΦiT
-    Vector3D ha =  MathUtility::GetTriangleVertexGradient(s_l,s_r);
-    Vector3D hb =  MathUtility::GetTriangleVertexGradient(l_r,l_s);
-    Vector3D hc =  MathUtility::GetTriangleVertexGradient(r_s,r_l);
+    Vector3D ha =  GetTriangleVertexGradient(s_l,s_r);
+    Vector3D hb =  GetTriangleVertexGradient(l_r,l_s);
+    Vector3D hc =  GetTriangleVertexGradient(r_s,r_l);
 
     //gradient field
-    Vector3D wx = hb*(l_s.m_x) + hc*(r_s.m_x);
-    Vector3D wy = hb*(l_s.m_y) + hc*(r_s.m_y);
-    Vector3D wz = hb*(l_s.m_z) + hc*(r_s.m_z);
+    Vector3D wx = hb*(l_s.x()) + hc*(r_s.x());
+    Vector3D wy = hb*(l_s.y()) + hc*(r_s.y());
+    Vector3D wz = hb*(l_s.z()) + hc*(r_s.z());
 
     //S△
-    double area = MathUtility::GetTriangleArea(source,vleft,vright);
+    double area = GetTriangleArea(source,vleft,vright);
 
     //divergence
-    Vector3D div = Vector3D(wx*ha*area,wy*ha*area,wz*ha*area);
+    Vector3D div(wx.dot(ha)*area,wy.dot(ha)*area,wz.dot(ha)*area);
     return   div;
 }
 
-void printPoint3d(const Point3D &p)
+Matrix4d Translate2Matrix(double x,double y,double z)
 {
-    cout << p.m_x << " " << p.m_y << " " << p.m_z;
+    Matrix4d result = Matrix4d::Identity();
+
+    result(0,3) = x;
+    result(1,3) = y;
+    result(2,3) = z;
+
+    return result;
+}
+
+Point3D ComputeMatrixMultiPoint(Matrix4d Mt, Point3D point)
+{
+    /*
+    |m1  m2  m3  m4 |   |x|
+    |m5  m6  m7  m8 | * |y|
+    |m9  m10 m11 m12|   |z|
+    |m13 m14 m15 m16|   |1|
+    */
+
+    double x = Mt(0,0)*point.x() + Mt(0,1)*point.y() + Mt(0,2)*point.z() + Mt(0,3);
+    double y = Mt(1,0)*point.x() + Mt(1,1)*point.y() + Mt(1,2)*point.z() + Mt(1,3);
+    double z = Mt(2,0)*point.x() + Mt(2,1)*point.y() + Mt(2,2)*point.z() + Mt(2,3);
+    Point3D tar(x, y, z);
+
+    return tar;
 }
 
 void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh::VertexHandle vh_l,MyMesh::VertexHandle vh_r,
@@ -212,13 +272,13 @@ void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh
 
     int s = vh_s.idx(), l = vh_l.idx(), r = vh_r.idx();
     Point3D v      =  Point3D(mesh.point(vh_s)[0],mesh.point(vh_s)[1],mesh.point(vh_s)[2]);
-    Point3D	vleft  =  Point3D(mesh.point(vh_l)[0],mesh.point(vh_l)[1],mesh.point(vh_l)[2]);
+    Point3D vleft  =  Point3D(mesh.point(vh_l)[0],mesh.point(vh_l)[1],mesh.point(vh_l)[2]);
     Point3D vright =  Point3D(mesh.point(vh_r)[0],mesh.point(vh_r)[1],mesh.point(vh_r)[2]);
-    Point3D center((v.m_x+vleft.m_x+vright.m_x)/3.0, (v.m_y+vleft.m_y+vright.m_y)/3.0, (v.m_z+vleft.m_z+vright.m_z)/3.0);
+    Point3D center((v.x()+vleft.x()+vright.x())/3.0, (v.y()+vleft.y()+vright.y())/3.0, (v.z()+vleft.z()+vright.z())/3.0);
     //std::cout << "v";printPoint3d(v);std::cout << std::endl;
     //ensure local transform
-    Matrix4d  t1 = MathUtility::Translate2Matrix(center.m_x,center.m_y,center.m_z);
-    Matrix4d  t2 = MathUtility::Translate2Matrix(-center.m_x,-center.m_y,-center.m_z);
+    Matrix4d  t1 = Translate2Matrix(center.x(),center.y(),center.z());
+    Matrix4d  t2 = Translate2Matrix(-center.x(),-center.y(),-center.z());
     //puts("t1");
     //std::cout << t1.format(CommaInitFmt) << std::endl;
     //std::cout << t2.format(CommaInitFmt) << std::endl;
@@ -239,9 +299,9 @@ void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh
     //puts("interpMAt");
     //std::cout << interpMat.format(CommaInitFmt) << std::endl;
 
-    source = MathUtility::ComputeMatrixMultiPoint(triangleTransMatrix,v);
-    left   = MathUtility::ComputeMatrixMultiPoint(triangleTransMatrix,vleft);
-    right  = MathUtility::ComputeMatrixMultiPoint(triangleTransMatrix,vright);
+    source = ComputeMatrixMultiPoint(triangleTransMatrix,v);
+    left = ComputeMatrixMultiPoint(triangleTransMatrix,vleft);
+    right = ComputeMatrixMultiPoint(triangleTransMatrix,vright);
 }
 
 void PoissonDeformation::deform()

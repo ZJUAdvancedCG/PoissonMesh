@@ -2,9 +2,13 @@
 #define POISSONDEFORMATION_H
 #include "../mesh.h"
 #include "meshlaplaciansolver.h"
+
 #include "../utility/quaternion.h"
-#include "../utility/pointvector.h"
+
 #include <vector>
+
+typedef Vector3d Vector3D;
+typedef Vector3d Point3D;
 class PoissonDeformation
 {
 private:
