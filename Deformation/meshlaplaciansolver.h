@@ -22,6 +22,8 @@ private:
     vector<bool> isControlVertex;
     Eigen::SparseLU<Eigen::SparseMatrix<double>,
         Eigen::COLAMDOrdering<int> > solver;
+    Eigen::ConjugateGradient<SparseMatrix<double> > cg;
+    Eigen::BiCGSTAB<SparseMatrix<double> > bc;
     Eigen::SparseMatrix<double> A;
     Eigen::VectorXd B,X;
 };

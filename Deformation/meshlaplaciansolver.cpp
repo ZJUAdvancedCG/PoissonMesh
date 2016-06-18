@@ -82,12 +82,14 @@ void MeshLaplacianSolver::ComputeLaplacianMatrix()
     //std::cout <<"--compressed A--" <<std::endl;
     A.makeCompressed();
     //std::cout << A << std::endl;
-    solver.analyzePattern(A);
-    solver.factorize(A);
+//    solver.analyzePattern(A);
+    //solver.compute(A);
+    bc.compute(A);
 }
 
 Eigen::VectorXd& MeshLaplacianSolver::LaplacainSolve()
 {
-    X = solver.solve(B);
+//    X = solver.solve(B);
+    X = bc.solve(B);
     return X;
 }
