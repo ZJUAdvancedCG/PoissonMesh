@@ -47,6 +47,7 @@ public:
     MyMesh& getMesh(){return mesh;}
     void loadObj(string filename);
     void Reset();
+    void clearSelect();
 
 
 

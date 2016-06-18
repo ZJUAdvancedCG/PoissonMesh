@@ -143,17 +143,6 @@ void MeshObj::fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4
             //qDebug() << "Fix: Contains" << id;
         }
     }
-
-    //force debug
-    //fixVertexIds.clear();
-    //fixVertexIds.push_back(4);
-    //fixVertexIds.push_back(5);
-    //fixVertexIds.push_back(6);
-    //fixVertexIds.push_back(7);
-
-
-    //qDebug() << rect;
-    //qDebug() << "size " << selectVertexIds.size();
 }
 
 
@@ -256,10 +245,18 @@ void MeshObj::loadObj(string filename)
 void MeshObj::Reset()
 {
     mesh = copy;
+    selectVertexIds.clear();
+    fixVertexIds.clear();
 }
 
 #include <QMessageBox>
 
 void MeshObj::deformation()
 {
+}
+
+void MeshObj::clearSelect()
+{
+    selectVertexIds.clear();
+    fixVertexIds.clear();
 }
