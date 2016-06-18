@@ -12,8 +12,10 @@ void PoissonDeformation::setObj(MeshObj& meshObj)
     this->selectVertexId=pMeshObj->getSelectVertexIds();
     this->fixVertexId=pMeshObj->getFixVertexIds();
     m_handTransMat = Matrix4d::Identity();
-    m_quater_fixed.R2Q(0,1,0,0);
-    vector<bool> iscontrol = isControlVertex();
+    //m_quater_fixed.R2Q(0,1,0,0);
+    m_quater_fixed = QQuaternion::fromAxisAndAngle(1,0,0,0);
+
+   // vector<bool> iscontrol = isControlVertex();
    // QVector<bool> qbool = QVector<bool>::fromStdVector(iscontrol);
    // qDebug() << qbool;
     LPsolver.set(mesh,isControlVertex());
@@ -227,11 +229,10 @@ void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh
     double factor_r = freeVertexWeight[r];
     double factor = (factor_s+factor_l+factor_r)/3.0;
     //quaternuon  interpolation
-    CQuaternion quater;
+    QQuaternion quater = QQuaternion::slerp(m_quater_hand,m_quater_fixed,factor);
     //puts("quater_hand");
     //std::cout << m_quater_hand.w << " " << m_quater_hand.x << " " << m_quater_hand.y << " " << m_quater_hand.z << endl;
-    quater.Slerp(m_quater_hand,m_quater_fixed,factor);
-    quater.Q2R(interpMat);
+    quaterToMatrix(quater,interpMat);
 
     //local transform
     triangleTransMatrix = t1*interpMat*t2;
@@ -278,5 +279,5 @@ void PoissonDeformation::InterTransform(const Matrix4d &mat)
 {
     //puts("!!!!");
     //std::cout << mat.format(CommaInitFmt) << std::endl;
-    m_quater_hand.RotationMatrix2Qua(mat);
+    m_quater_hand=matrixToQuater(mat);
 }

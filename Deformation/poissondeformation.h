@@ -2,7 +2,7 @@
 #define POISSONDEFORMATION_H
 #include "../mesh.h"
 #include "meshlaplaciansolver.h"
-#include "../utility/cquaternion.h"
+#include "../utility/quaternion.h"
 #include "../utility/pointvector.h"
 #include <vector>
 class PoissonDeformation
@@ -13,8 +13,8 @@ private:
     VectorXd divMatrixY;
     VectorXd divMatrixZ;
     MeshLaplacianSolver LPsolver;
-    CQuaternion m_quater_fixed;
-    CQuaternion m_quater_hand;
+    QQuaternion m_quater_fixed;
+    QQuaternion m_quater_hand;
     Matrix4d m_handTransMat;
 
     MyMesh mesh;

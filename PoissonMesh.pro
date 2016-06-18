@@ -8,7 +8,7 @@ HEADERS       = glwidget.h \
     Deformation/poissondeformation.h \
     utility/mathutility.h \
     utility/pointvector.h \
-    utility/cquaternion.h
+    utility/quaternion.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -18,7 +18,7 @@ SOURCES       = glwidget.cpp \
     Deformation/poissondeformation.cpp \
     utility/mathutility.cpp \
     utility/pointvector.cpp \
-    utility/cquaternion.cpp
+    utility/quaternion.cpp
 
 QT           += opengl widgets
 
