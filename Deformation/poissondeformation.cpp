@@ -201,8 +201,8 @@ Vector3D GetTriangleVertexGradient( Vector3D a,  Vector3D b)
     high = (b - a)*ratio + a;
     high = high*(-1);
 
-    high.normalize();
-
+    double n = high.norm();
+    high /= (n*n);
     return high;
 }
 
