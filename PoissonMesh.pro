@@ -1,14 +1,13 @@
 
 CONFIG += c++11
-HEADERS       = glwidget.h \
+HEADERS       = \
                 window.h \
     mesh.h \
     utility/basedefine.h \
     Deformation/meshlaplaciansolver.h \
     Deformation/poissondeformation.h \
-    utility/mathutility.h \
-    utility/pointvector.h \
-    utility/cquaternion.h
+    utility/cquaternion.h \
+    glwidget.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -16,8 +15,6 @@ SOURCES       = glwidget.cpp \
                 mesh.cpp \
     Deformation/meshlaplaciansolver.cpp \
     Deformation/poissondeformation.cpp \
-    utility/mathutility.cpp \
-    utility/pointvector.cpp \
     utility/cquaternion.cpp
 
 QT           += opengl widgets

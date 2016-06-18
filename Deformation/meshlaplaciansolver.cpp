@@ -1,8 +1,40 @@
 #include "meshlaplaciansolver.h"
-#include "../utility/pointvector.h"
+//#include "../utility/pointvector.h"
 #include <algorithm>
 #include <QDebug>
+typedef Vector3d Vector3D;
 IOFormat CleanFmt(4, 0, ", ", "\n", "[", "]");
+#include <Eigen/Dense>
+double SinValue(const Vector3D& a, const Vector3D& b, const Vector3D& c)
+{
+    double lab = (b - a).norm();
+    double lac = (c - a).norm();
+    //return ((b-a).cross(c-a)).norm()/(lab*lac);
+    Vector3D ba = b-a;
+    Vector3D ca = c-a;
+    Vector3D t= ba.cross(ca);
+    return t.norm()/(ba.norm()*ca.norm());
+}
+
+double CosValue(const Vector3D& a, const Vector3D& b, const Vector3D& c)
+{
+    double lab = (b - a).norm();
+    double lac = (c - a).norm();
+    double lbc = (b - c).norm();
+    double lab2 = lab*lab;
+    double lac2 = lac*lac;
+    double lbc2 = lbc*lbc;
+    return (lab2+lac2-lbc2)/(2.0*lab*lac);
+}
+
+double CotValue(const Vector3D& a, const Vector3D& b, const Vector3D& c)
+{
+    double cosx = CosValue(a,b,c);
+    double sinx = std::max(SinValue(a,b,c),1e-8);
+    double cotx = cosx/sinx;
+    return cotx;
+}
+
 void MeshLaplacianSolver::ComputeVertexLaplacianWeight()
 {
     mesh.add_property(vertexLPLWeight);
