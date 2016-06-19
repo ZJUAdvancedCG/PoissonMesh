@@ -7,7 +7,9 @@ HEADERS       = \
     Deformation/meshlaplaciansolver.h \
     Deformation/poissondeformation.h \
     utility/quaternion.h \
-    glwidget.h
+    glwidget.h \
+    utility/meshutility.h \
+    utility/hasher.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
@@ -15,7 +17,8 @@ SOURCES       = glwidget.cpp \
                 mesh.cpp \
     Deformation/meshlaplaciansolver.cpp \
     Deformation/poissondeformation.cpp \
-    utility/quaternion.cpp
+    utility/quaternion.cpp \
+    utility/meshutility.cpp
 
 QT           += opengl widgets
 
@@ -29,8 +32,13 @@ contains(QT_CONFIG, opengles.|angle):error("This example requires Qt to be confi
 
 macx: LIBS += -L$$PWD/lib/ -lOpenMeshCore
 
+
+
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/eigen3
+INCLUDEPATH += /usr/local/include
+INCLUDEPATH += /System/Library/Frameworks/Python.framework/Headers/
+
 # DEPENDPATH += $$PWD/.
 
 # macx: PRE_TARGETDEPS += $$PWD/lib/libOpenMeshCore.a

@@ -9,6 +9,10 @@
 
 typedef Vector3d Vector3D;
 typedef Vector3d Point3D;
+
+
+
+
 class PoissonDeformation
 {
 private:
@@ -28,6 +32,7 @@ private:
     std::vector<double> freeVertexWeight;
 
 public:
+    void testMeshs();
     void ComputeFreeVertexWeight();
     PoissonDeformation(){}
     void setObj(MeshObj& mesh);
