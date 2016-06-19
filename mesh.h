@@ -41,7 +41,7 @@ public:
     void fix(QMatrix4x4 modelview, QMatrix4x4 project, const int viewport[4], int viewheight);
     void setRegion(QRect rect);
     void changeSelectedPosition(float dx, float dy, float dz);
-    void rotateSelected(float rx, float ry, float rz);
+    void rotateSelected(float rx, float ry, float rz, float angle);
     void deformation();
     vector<int> &getSelectVertexIds(){return selectVertexIds;}
     vector<int> &getFixVertexIds(){return fixVertexIds;}

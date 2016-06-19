@@ -133,24 +133,22 @@ void GLWidget::setZRotation(int angle)
 void GLWidget::setSelectedPosition(float dx, float dy, float dz)
 {
     obj.changeSelectedPosition(dx, dy, dz);
-    Affine3d transform(Translation3d(dx, dy, dz));
+   /* Affine3d transform(Translation3d(dx, dy, dz));
     Matrix4d mat = transform.matrix();
-    pd.InterTransform(mat);
+    pd.InterTransform(mat);*/
     update();
 }
 
-void GLWidget::rotateSelected(float x, float y, float z)
+void GLWidget::rotateSelected(float x, float y, float z, float angle)
 {
-    obj.rotateSelected(x, y, z);
-    QQuaternion rotate = QQuaternion::fromEulerAngles(x, y, z);
-    //qDebug() << "rotate Matrix";
-    //qDebug() << rotate.toRotationMatrix();
+    obj.rotateSelected(x, y, z, angle);
+    QQuaternion rotate = QQuaternion::fromAxisAndAngle(x, y, z, angle);
     QVector4D qrotate = rotate.toVector4D();
     Matrix3d mat3 = Quaterniond(qrotate.w(),qrotate.x(), qrotate.y(), qrotate.z()).toRotationMatrix();
     Matrix4d mat4 = Matrix4d::Identity();
     mat4.block(0,0,3,3) = mat3;
 
-    pd.InterTransform(mat4);
+    pd.InterTransform(obj.getSelectVertexIds(),rotate);
 
     qDebug() << "update!!";
     update();
@@ -219,6 +217,9 @@ void GLWidget::paintGL()
     //set light
     setLight();
 
+
+
+
     glTranslatef(0.0, 0.0, -10.0f);
     glScalef(1/scale, 1/scale, 1/scale);
     glRotatef(xRot / 16.0, 1.0, 0.0, 0.0);
@@ -226,6 +227,22 @@ void GLWidget::paintGL()
     glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
     //logo->draw(static_cast<QOpenGLFunctions_1_1 *>(this));
     //glPushMatrix();
+
+    glBegin(GL_LINES);
+    glColor3f(1, 0, 0);
+    glVertex3f(-50, -2, -20);
+    glVertex3f(50, -2, -20);
+
+    glColor3f(0, 1, 0);
+    glVertex3f(0, -50, -20);
+    glVertex3f(0, 50, -20);
+
+    glColor3f(0, 0, 1);
+    glVertex3f(0, -2, -100);
+    glVertex3f(0, -2, 10);
+    glEnd();
+
+
     if(select)
     {
         int viewport[4];

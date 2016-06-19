@@ -212,9 +212,9 @@ void MeshObj::changeSelectedPosition(float dx, float dy, float dz)
     }
 }
 
-void MeshObj::rotateSelected(float rx, float ry, float rz)
+void MeshObj::rotateSelected(float rx, float ry, float rz, float angle)
 {
-    QQuaternion rotate = QQuaternion::fromEulerAngles(rx, ry, rz);
+    QQuaternion rotate = QQuaternion::fromAxisAndAngle(rx, ry, rz, angle);
     QMatrix4x4 matrix(rotate.toRotationMatrix());
 
     for(int id:selectVertexIds)
@@ -224,9 +224,6 @@ void MeshObj::rotateSelected(float rx, float ry, float rz)
         position = matrix*position;
         MyMesh::Point newposition(position.x(), position.y(), position.z());
         mesh.set_point(vhl, newposition);
-        //
-        //point = mesh.point(vhl);
-        //qDebug() << point[0] << " " << point[1] << " " << point[2];
     }
 }
 

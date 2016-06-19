@@ -23,7 +23,7 @@ private:
     VectorXd divMatrixZ;
     MeshLaplacianSolver LPsolver;
     QQuaternion m_quater_fixed;
-    QQuaternion m_quater_hand;
+    //QQuaternion m_quater_hand;
     Matrix4d m_handTransMat;
 
     MyMesh mesh;
@@ -33,7 +33,7 @@ private:
     std::vector<double> freeVertexWeight;
 
     //
-    map<int, QQuaternion> changes;
+    map<int, QQuaternion> rotations;
 
 public:
     void testMeshs();
@@ -50,7 +50,7 @@ public:
     void deform();
     vector<bool> isControlVertex();
 
-    void InterTransform(const Matrix4d &mat);
+    void InterTransform(const vector<int> &selectedVertexIds, const QQuaternion &rotate);
 };
 
 

@@ -71,7 +71,7 @@ public slots:
     void setZRotation(int angle);
     void setSelectedPosition(float dx, float dy, float dz);
 
-    void rotateSelected(float x, float y, float z);
+    void rotateSelected(float x, float y, float z, float angle);
     void loadObj(string filename);
 
 signals:

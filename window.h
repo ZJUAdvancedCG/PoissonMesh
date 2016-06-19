@@ -73,7 +73,7 @@ private:
     QSlider *zSlider;
 
     QLineEdit *px,*py,*pz;
-    QLineEdit *rx, *ry, *rz;
+    QLineEdit *rx;//, *ry, *rz;
 
     QLabel *selectModeLabel;
 };

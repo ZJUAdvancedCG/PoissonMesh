@@ -109,13 +109,13 @@ Window::Window()
         QWidget *rotate = new QWidget;
             QHBoxLayout *rotater = new QHBoxLayout;
             rx = LineEdit();
-            ry = LineEdit();
-            rz = LineEdit();
+           // ry = LineEdit();
+           // rz = LineEdit();
             QLabel *rl = new QLabel("Rotate");
             rotater->addWidget(rl);
             rotater->addWidget(rx);
-            rotater->addWidget(ry);
-            rotater->addWidget(rz);
+           // rotater->addWidget(ry);
+           // rotater->addWidget(rz);
        rotate->setLayout(rotater);
 
         QPushButton *button = new QPushButton("Deformation");
@@ -159,14 +159,18 @@ Window::Window()
 
     connect(rx, &QLineEdit::editingFinished, [=](){
         QString content = rx->text();
-        bool ok;
-         float value = content.toFloat(&ok);
-        if(ok)
-        glWidget->rotateSelected(value, 0, 0);
-        rx->clear();
-       //glWidget->setFocus();
-    });
+        float x,y,z,angle;
+            QTextStream(&content) >> x >> y >> z >> angle;
+            if(angle != 0)
+            {
+                qDebug() << x << y << z << angle;
+                glWidget->rotateSelected(x, y, z, angle);
+            }
 
+       rx->clear();
+       glWidget->setFocus();
+    });
+/*
     connect(ry, &QLineEdit::editingFinished, [=](){
         QString content = ry->text();
         bool ok;
@@ -185,7 +189,7 @@ Window::Window()
         glWidget->rotateSelected(0, 0, value);
         rz->clear();
        // glWidget->setFocus();
-    });
+    });*/
 
     connect(button, &QPushButton::clicked, [=](){
         glWidget->pd.deform();

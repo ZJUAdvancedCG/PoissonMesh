@@ -309,7 +309,7 @@ void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh
     double factor_r = freeVertexWeight[r];
     double factor = (factor_s+factor_l+factor_r)/3.0;
     //quaternuon  interpolation
-    QQuaternion quater = QQuaternion::slerp(m_quater_hand,m_quater_fixed,factor);
+    QQuaternion quater ;//= QQuaternion::slerp(m_quater_hand,m_quater_fixed,factor);
     //puts("quater_hand");
     //std::cout << m_quater_hand.w << " " << m_quater_hand.x << " " << m_quater_hand.y << " " << m_quater_hand.z << endl;
     quaterToMatrix(quater,interpMat);
@@ -384,9 +384,19 @@ void PoissonDeformation::testMeshs(){
     }
 }
 
-void PoissonDeformation::InterTransform(const Matrix4d &mat)
+void PoissonDeformation::InterTransform(const vector<int> &selectedVertexIds, const QQuaternion &rotate)
 {
-    //puts("!!!!");
-    //std::cout << mat.format(CommaInitFmt) << std::endl;
-    m_quater_hand=matrixToQuater(mat);
+    for(int id:selectedVertexIds)
+    {
+        if(rotations.count(id))
+            rotations[id] *= rotate;
+        else
+            rotations[id] = rotate;
+    }
+
+    //debug
+    for(auto iter:rotations){
+        qDebug() << iter.first << iter.second;
+    }
+   // m_quater_hand=rotate;
 }
