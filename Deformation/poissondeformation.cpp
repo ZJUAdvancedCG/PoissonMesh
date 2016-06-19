@@ -353,6 +353,16 @@ void PoissonDeformation::deform()
     }
 
 }
+//#define GEODE_OPENMESH
+//#include <geode/openmesh/TriMesh.h>
+//void PoissonDeformation::testMeshs(){
+//    for(int id:selectVertexId)
+//    {
+//        MyMesh::VertexHandle vhl(id);
+//        auto v = geode::TriMesh();
+
+//    }
+//}
 
 void PoissonDeformation::InterTransform(const Matrix4d &mat)
 {

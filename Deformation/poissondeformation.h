@@ -10,6 +10,10 @@
 
 typedef Vector3d Vector3D;
 typedef Vector3d Point3D;
+
+
+
+
 class PoissonDeformation
 {
 private:
@@ -32,6 +36,7 @@ private:
     map<int, QQuaternion> changes;
 
 public:
+    void testMeshs();
     void ComputeFreeVertexWeight();
     //void ComputeFree();
     PoissonDeformation(){}

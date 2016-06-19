@@ -2,6 +2,7 @@
 #include <fstream>
 #include <QQuaternion>
 #include <QVector>
+#include <utility/meshutility.h>
 using namespace std;
 
 MeshObj::MeshObj()
@@ -280,7 +281,7 @@ struct PathNode{
 
 void MeshObj::TestGeode()
 {
-    int start = 0;
+    /*int start = 0;
     vector<bool> visited(mesh.n_vertices(),false);
     vector<double> dist(mesh.n_vertices(),1<<30);
     priority_queue<PathNode> q;
@@ -307,13 +308,22 @@ void MeshObj::TestGeode()
                 q.push(PathNode(neighborId, newdist));
             }
         }
+    }*/
+    vector<MyMesh::VertexHandle> source(1,MyMesh::VertexHandle(0));
+    vector<MyMesh::VertexHandle> sinks(selectVertexIds.size());
+    for(int i=0;i<sinks.size();i++)
+        sinks[i] = MyMesh::VertexHandle(selectVertexIds[i]);
+    auto ret = geodesic_distance(mesh, source, sinks);
+    for(auto iter:ret)
+    {
+        qDebug() << iter.first << iter.second;
     }
 
     //test result
-    QVector<double> dist2select;
+   /* QVector<double> dist2select;
     for(int i:selectVertexIds)
     {
         dist2select.push_back(dist[i]);
     }
-    qDebug() << dist2select;
+    qDebug() << dist2select;*/
 }
