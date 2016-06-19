@@ -1,4 +1,5 @@
 #include "poissondeformation.h"
+#include "../utility/meshutility.h"
 #include <iostream>
 IOFormat CommaInitFmt(4, 0, ", ", "\n", "[", "]");
 
@@ -325,6 +326,7 @@ void PoissonDeformation::TriangleLocalTransform(MyMesh::VertexHandle vh_s,MyMesh
 
 void PoissonDeformation::deform()
 {
+    //testMeshs();
     ComputeCoefficientMatrix();
     ComputeDivergence();
 
@@ -353,16 +355,34 @@ void PoissonDeformation::deform()
     }
 
 }
-//#define GEODE_OPENMESH
-//#include <geode/openmesh/TriMesh.h>
-//void PoissonDeformation::testMeshs(){
-//    for(int id:selectVertexId)
-//    {
-//        MyMesh::VertexHandle vhl(id);
-//        auto v = geode::TriMesh();
 
-//    }
-//}
+
+void PoissonDeformation::testMeshs(){
+
+    int num = pMeshObj->mesh.n_vertices();
+    vector<bool> isControl(num, false);
+    for(int i:selectVertexId)
+        isControl[i] = true;
+    for(int i:fixVertexId)
+        isControl[i] = true;
+
+    vector<MyMesh::VertexHandle> sources;
+    vector<MyMesh::VertexHandle> sinks;
+
+    for(int i=0;i<num; i++){
+        MyMesh::VertexHandle vhl(i);
+        if(isControl[i]){
+            sources.push_back(vhl);
+        }else{
+            sinks.push_back(vhl);
+        }
+    }
+    auto ret = geodesic_distance(mesh,sources,sinks);
+    puts("++++++++++++++++++distance test+++++++++++++++++++");
+    for(auto& mapPair : ret){
+        cout<<mapPair.first<<" "<<mapPair.second<<endl;
+    }
+}
 
 void PoissonDeformation::InterTransform(const Matrix4d &mat)
 {

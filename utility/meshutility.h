@@ -7,6 +7,9 @@
 
 using namespace std;
 
+unordered_map<int, double> geodesic_distance(MyMesh& mesh, MyMesh::VertexHandle source,
+                                             vector<MyMesh::VertexHandle> const &sinks);
+
 
 unordered_map<int, double> geodesic_distance(MyMesh& mesh,vector<MyMesh::VertexHandle> const &sources,
                                                                      vector<MyMesh::VertexHandle> const &sinks);

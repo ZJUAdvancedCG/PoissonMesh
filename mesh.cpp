@@ -309,9 +309,9 @@ void MeshObj::TestGeode()
             }
         }
     }*/
-    vector<MyMesh::VertexHandle> source(1,MyMesh::VertexHandle(0));
+    MyMesh::VertexHandle source(0);
     vector<MyMesh::VertexHandle> sinks(selectVertexIds.size());
-    for(int i=0;i<sinks.size();i++)
+    for(unsigned i=0;i<sinks.size();i++)
         sinks[i] = MyMesh::VertexHandle(selectVertexIds[i]);
     auto ret = geodesic_distance(mesh, source, sinks);
     for(auto iter:ret)

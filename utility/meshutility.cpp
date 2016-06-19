@@ -13,6 +13,14 @@ using namespace std;
 using namespace geode;
 using namespace OpenMesh;
 #define inf DBL_MAX
+
+unordered_map<int, double> geodesic_distance(MyMesh& mesh, MyMesh::VertexHandle source,
+                                             vector<MyMesh::VertexHandle> const &sinks) {
+    return geodesic_distance(mesh,vector<MyMesh::VertexHandle>(1,source), sinks);
+}
+
+
+
 unordered_map<int, double> geodesic_distance(MyMesh& mesh,vector<MyMesh::VertexHandle> const &sources,
                                                                      vector<MyMesh::VertexHandle> const &sinks){
 
@@ -34,11 +42,11 @@ unordered_map<int, double> geodesic_distance(MyMesh& mesh,vector<MyMesh::VertexH
     return dist;
 
   std::priority_queue<Prioritize<MyMesh::VertexHandle>, vector<Prioritize<MyMesh::VertexHandle> >, std::greater<Prioritize<MyMesh::VertexHandle> > > queue;
+  //小顶堆
   for(auto& vh : sources)
     queue.push(prioritize(vh, 0.));
-
+  //初始为0
   while (!queue.empty()) {
-
     MyMesh::VertexHandle current = queue.top().a;
     double d = queue.top().p;
     queue.pop();
@@ -54,7 +62,6 @@ unordered_map<int, double> geodesic_distance(MyMesh& mesh,vector<MyMesh::VertexH
       }
     }
     for (MyMesh::ConstVertexVertexIter vv = mesh.cvv_iter(current); vv.is_valid(); ++vv) {
-
       double l = (mesh.point(*vv) - mesh.point(current)).length();
       double newdist = d + l;
       assert(isfinite(newdist));
