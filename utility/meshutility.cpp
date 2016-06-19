@@ -5,7 +5,6 @@
 #include <queue>
 #include <vector>
 #include <../mesh.h>
-#include "hasher.h"
 #include <geode/utility/prioritize.h>
 
 #include <float.h>

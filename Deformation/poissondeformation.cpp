@@ -1,5 +1,4 @@
 #include "poissondeformation.h"
-//#include "../utility/mathutility.h"
 #include <iostream>
 IOFormat CommaInitFmt(4, 0, ", ", "\n", "[", "]");
 

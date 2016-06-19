@@ -192,6 +192,7 @@ Window::Window()
         glWidget->obj.deformation();
         glWidget->pd.setObj(glWidget->obj);
         qDebug()<<"finish!";
+        glWidget->obj.clearSelect();
         glWidget->updateGL();
     });
 

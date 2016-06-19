@@ -8,8 +8,7 @@ HEADERS       = \
     Deformation/poissondeformation.h \
     utility/quaternion.h \
     glwidget.h \
-    utility/meshutility.h \
-    utility/hasher.h
+    utility/meshutility.h
 
 SOURCES       = glwidget.cpp \
                 main.cpp \
