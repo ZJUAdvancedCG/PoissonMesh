@@ -28,6 +28,25 @@ void PoissonDeformation::ComputeCoefficientMatrix()
 }
 
 #include <iostream>
+/*
+void PoissonDeformation::ComputeFree()
+{
+    vector<bool> isControl = isControlVertex();
+    vector<MyMesh::VertexHandle> changeSets(changes.size());
+
+    for(auto iter:changes){
+        changeSets[iter.first] = MyMesh::VertexHandle(iter.first);
+    }
+
+   for(MyMesh::VertexIter v_it = m_static_mesh.vertices_begin(); v_it != m_static_mesh.vertices_end(); v_it++)
+   {
+       vid = v_it->idx();
+       if(isControl[vid])
+           continue;
+       geodesic_distance()
+   }
+    vector<MyMesh::VertexHandle> vhl()
+}*/
 
 void PoissonDeformation::ComputeFreeVertexWeight(){
     MeshLaplacianSolver tmpLPsolver;
@@ -48,7 +67,8 @@ void PoissonDeformation::ComputeFreeVertexWeight(){
 
     VectorXd  x = tmpLPsolver.LaplacainSolve();
     for(int i = 0; i < nvertex; i++)
-        freeVertexWeight.push_back(1-x[i]);
+        freeVertexWeight.push_back(0);
+        //freeVertexWeight.push_back(1-x[i]);
     //puts("--free vertex weight---");
     //for(int i:freeVertexWeight)
       //  std::cout << i << " ";

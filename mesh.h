@@ -28,6 +28,7 @@ private:
     //GLuint drawList;
     QRect rect;
     vector<int> selectVertexIds;
+
     vector<int> fixVertexIds;
     MyMesh copy;
     //bool changeMesh;
@@ -48,6 +49,9 @@ public:
     void loadObj(string filename);
     void Reset();
     void clearSelect();
+
+
+    void TestGeode();
 
 
 

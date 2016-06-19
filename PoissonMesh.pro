@@ -31,6 +31,7 @@ macx: LIBS += -L$$PWD/lib/ -lOpenMeshCore
 
 INCLUDEPATH += $$PWD
 INCLUDEPATH += $$PWD/eigen3
+
 # DEPENDPATH += $$PWD/.
 
 # macx: PRE_TARGETDEPS += $$PWD/lib/libOpenMeshCore.a

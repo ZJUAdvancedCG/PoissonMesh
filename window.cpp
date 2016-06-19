@@ -134,7 +134,7 @@ Window::Window()
         if(ok)
         glWidget->setSelectedPosition(value, 0, 0);
         px->clear();
-        //glWidget->setFocus();
+        glWidget->setFocus();
     });
 
     connect(py, &QLineEdit::editingFinished, [=](){

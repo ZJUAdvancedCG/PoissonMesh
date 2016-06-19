@@ -1,6 +1,7 @@
 #include "mesh.h"
 #include <fstream>
 #include <QQuaternion>
+#include <QVector>
 using namespace std;
 
 MeshObj::MeshObj()
@@ -259,4 +260,60 @@ void MeshObj::clearSelect()
 {
     selectVertexIds.clear();
     fixVertexIds.clear();
+}
+
+#include <queue>
+#include <algorithm>
+
+struct PathNode{
+    int id;
+    double distance;
+
+    PathNode(int _id, double _distance)
+        :id(_id), distance(_distance){}
+    bool operator<(const PathNode&n) const{
+        if(distance == n.distance)
+            return id<n.id;
+        return distance < n.distance;
+    }
+};
+
+void MeshObj::TestGeode()
+{
+    int start = 0;
+    vector<bool> visited(mesh.n_vertices(),false);
+    vector<double> dist(mesh.n_vertices(),1<<30);
+    priority_queue<PathNode> q;
+    q.push(PathNode(start, 0));
+    while(!q.empty())
+    {
+        PathNode n = q.top();
+        q.pop();
+        if(visited[n.id])
+            continue;
+        visited[n.id] = true;
+        //circulate around neigborhood
+        MyMesh::VertexHandle vhl(n.id);
+        MyMesh::Point current = mesh.point(vhl);
+        for (MyMesh::VertexVertexIter vv_it=mesh.vv_iter(vhl); vv_it.is_valid(); ++vv_it)
+        {
+            int neighborId = vv_it->idx();
+            MyMesh::Point neigbor = mesh.point(vv_it);
+            double newdist = n.distance+(neigbor-current).length();
+            if(newdist < dist[neighborId])
+            {
+                //update
+                dist[neighborId] = newdist;
+                q.push(PathNode(neighborId, newdist));
+            }
+        }
+    }
+
+    //test result
+    QVector<double> dist2select;
+    for(int i:selectVertexIds)
+    {
+        dist2select.push_back(dist[i]);
+    }
+    qDebug() << dist2select;
 }

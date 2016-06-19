@@ -347,5 +347,11 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         qDebug() << "selectMode" << selectMode;
         emit changeSelectMode(selectMode);
     }
+
+    if(event->key()==Qt::Key_Space)
+    {
+        qDebug() << "Press option";
+        obj.TestGeode();
+    }
     update();
 }

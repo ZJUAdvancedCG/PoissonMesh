@@ -5,6 +5,7 @@
 
 #include "../utility/quaternion.h"
 
+#include <map>
 #include <vector>
 
 typedef Vector3d Vector3D;
@@ -27,8 +28,12 @@ private:
     MyMesh m_static_mesh;
     std::vector<double> freeVertexWeight;
 
+    //
+    map<int, QQuaternion> changes;
+
 public:
     void ComputeFreeVertexWeight();
+    //void ComputeFree();
     PoissonDeformation(){}
     void setObj(MeshObj& mesh);
     void ComputeCoefficientMatrix();
